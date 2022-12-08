@@ -33,18 +33,23 @@ class TassInstaloader:
                 self.L.download_post(post, target = profile.username)
                 k = 0  # set k to 0
 
+
+    def get_posts_for_profile(self, profile_name: str, since: datetime, until: datetime) -> None:
+        profile = self.get_profile(profile_name)
+        posts = profile.get_posts()
+        self.download_post_from_time_range(profile, posts, since, until)
+
 def main():
     # initiate TassInstaloader
     tass_instaloader = TassInstaloader('your_username', 'your_password')
     
     # get profile
-    profile = tass_instaloader.get_profile('tass')
-    
-    # get posts
-    posts = profile.get_posts()
+    profile_name = 'tass'
+    profile = tass_instaloader.get_profile(profile_name)
     
     # download posts from 2019-01-01 to 2019-01-31
-    tass_instaloader.download_post_from_time_range(profile, posts, since = datetime(2019, 1, 1), until = datetime(2019, 1, 31))
+    tass_instaloader.get_posts_for_profile(profile_name, since = datetime(2019, 1, 1),
+                                                         until = datetime(2019, 1, 31))
 
 # if __name__ == '__main__':
 #     main()

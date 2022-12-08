@@ -1,29 +1,24 @@
-# %%
+# %% import packages
 from sentence_transformers import SentenceTransformer
 from sentence_transformers import util
-
-import torch
 
 from transformers import AutoTokenizer, AutoModel
 from keyphrase_vectorizers import KeyphraseCountVectorizer
 from keybert import KeyBERT
 from datetime import datetime
 
+import torch
+
 from tass_instaloader import TassInstaloader
 from other.info_insta import insta_dict
 
-# from utils import read_all_lines_no_emoji, extract_kw_from_docs, heatmap
 import utils as utils
+# %% read all posts from time range
 # profile_name = 'harrykane'
 # tL = TassInstaloader(insta_dict['user'], insta_dict['password'])
-
-# profile = tL.get_profile(profile_name)
-# posts = profile.get_posts()
-
-# singe = datetime(2022, 9, 1)
-# until = datetime(2022, 11, 30)
-
-# tL.download_post_from_time_range(profile, posts, singe, until)
+# tL = tass_instaloader.get_posts_for_profile(profile_name,
+#                                             since = datetime(2019, 1, 1),
+#                                             until = datetime(2019, 1, 31))
 
 # %% read all docs
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -70,4 +65,5 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 all_encoding = encode_keywords(profiles, key_words, model)
 
 all_encoding['garethbale11'][0]
-# %%
+# %% Calculate cosine-similarities for each profile
+
