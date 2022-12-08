@@ -165,6 +165,6 @@ def find_all_kw(profiles: list[str], model, stemmer, vec) -> list[str]:
     all_kw = []
     for profile in profiles:
         docs = read_all_lines_no_emoji(stemmer, profile)
-        
+
         all_kw.extend(remove_sim_kw(extract_kw_from_docs(docs, model, vec)))
     return all_kw
