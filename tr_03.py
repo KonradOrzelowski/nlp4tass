@@ -7,8 +7,6 @@ from keyphrase_vectorizers import KeyphraseCountVectorizer
 from keybert import KeyBERT
 from datetime import datetime
 
-import torch
-
 from tass_instaloader import TassInstaloader
 from other.info_insta import insta_dict
 

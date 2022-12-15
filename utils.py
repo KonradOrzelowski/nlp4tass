@@ -1,7 +1,10 @@
 import glob
 import re
 import functools
+from sentence_transformers import util
+from datetime import datetime
 
+# TassNlp: read_profiles
 def remove_emojis(string: str) -> str:
     emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"  # emoticons
@@ -25,18 +28,8 @@ def remove_emojis(string: str) -> str:
                       "]+", re.UNICODE)
     return re.sub(emoji_pattern, '', string)
 
-
-# from nltk.stem.wordnet import WordNetLemmatizer
-
-# stemmer = PorterStemmer()
-# lemmatizer = WordNetLemmatizer()
-
-# print("Original Word: 'studies' ")
-# print()
-# print('With Stemming: ' + str(stemmer.stem("studies")))
-# print('with Lemmatization: ' + str(lemmatizer.lemmatize("studies")))
-
-def read_all_lines_no_emoji(stemmer, profile_name: str) -> list:
+# TassNlp: read_profiles
+def read_all_lines_no_emoji(lemmatizer, profile_name: str) -> list:
     
     txt_files = glob.glob(f"{profile_name}/*.txt")
     docs = []
@@ -44,9 +37,28 @@ def read_all_lines_no_emoji(stemmer, profile_name: str) -> list:
         with open(txt, 'r' , encoding="utf-8") as fd:
             all_of_it = fd.read()
             
-        docs.append(remove_emojis(str(stemmer.lemmatize(all_of_it))))
+        docs.append(remove_emojis(str(lemmatizer.lemmatize(all_of_it))))
     return docs
 
+
+# TassNlp: read_profiles
+def read_from_time_range(lemmatizer, profile_name: str, start_date, end_date) -> list:
+    
+    txt_files = glob.glob(f"{profile_name}/*.txt")
+    docs = []
+    
+    for txt in txt_files:
+        txt_data = txt.split("\\")[1].replace('_UTC.txt', '')
+        txt_data = datetime.strptime(txt_data, '%Y-%m-%d_%H-%M-%S')
+        if (txt_data > start_date) and (txt_data < end_date):
+            with open(txt, 'r' , encoding="utf-8") as fd:
+                all_of_it = fd.read()
+            docs.append(remove_emojis(str(lemmatizer.lemmatize(all_of_it))))
+    
+    return(docs)
+
+
+# TassNlp: find_all_keywords
 def extract_kw_from_docs(docs, model, vec):
     key_words = model.extract_keywords(docs=docs, 
                                           vectorizer=vec)
@@ -58,40 +70,11 @@ def extract_kw_from_docs(docs, model, vec):
     
     return lst
 
-
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-def heatmap(x_labels, y_labels, values):
-    fig, ax = plt.subplots()
-    im = ax.imshow(values)
-
-    # We want to show all ticks...
-    ax.set_xticks(np.arange(len(x_labels)))
-    ax.set_yticks(np.arange(len(y_labels)))
-    # ... and label them with the respective list entries
-    ax.set_xticklabels(x_labels)
-    ax.set_yticklabels(y_labels)
-
-    # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", fontsize=10,
-         rotation_mode="anchor")
-
-    # Loop over data dimensions and create text annotations.
-    for i in range(len(y_labels)):
-        for j in range(len(x_labels)):
-            text = ax.text(j, i, "%.2f"%values[i, j],
-                           ha="center", va="center", color="w", fontsize=6)
-
-    fig.tight_layout()
-    plt.show()
     
-    
+# TassNlp: find_all_keywords
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
-
-def remove_sim_kw(documents: list[str]) -> list[str]:
+def remove_sim_kw(documents: list[str], threshold:float) -> list[str]:
     '''
     Remove key words with similar meaning
 
@@ -125,46 +108,14 @@ def remove_sim_kw(documents: list[str]) -> list[str]:
     pairwise_similarity
     
     for idx, row in enumerate(pairwise_similarity):
-        if(pairwise_similarity[idx][max_idx[idx]] >= 0.5):
+        if(pairwise_similarity[idx][max_idx[idx]] >= threshold):
             documents[idx]= documents[max_idx[idx]]
     return list(set(documents))
 
 
-
-def call_sim(p2_docs1: list[str], p2_docs: list[str]) -> float:
-
-    documents = list(set(documents))
+def get_cos_similarity(nd1: np.ndarray, nd2: np.ndarray,
+                                             threshold = 0.5) -> np.float32:
     
-    tfidf = TfidfVectorizer().fit_transform(documents)
-    # no need to normalize, since Vectorizer will return normalized tf-idf
-    pairwise_similarity = tfidf * tfidf.T
+    cos_ndarray = util.pytorch_cos_sim(nd1, nd2).numpy()
     
-    pairwise_similarity = pairwise_similarity.toarray()
-    np.fill_diagonal(pairwise_similarity,0)
-    
-    
-    pairwise_similarity[np.argmax(pairwise_similarity, axis=1)]
-    
-    
-    max_idx = np.argmax(pairwise_similarity, axis=1)
-    
-    
-    pairwise_similarity
-    
-    for idx, row in enumerate(pairwise_similarity):
-        if(pairwise_similarity[idx][max_idx[idx]] >= 0.5):
-            documents[idx]= documents[max_idx[idx]]
-    return list(set(documents))
-
-
-## find all keywrods from all profiles
-def find_all_kw(profiles: list[str], model, stemmer, vec) -> list[str]:
-    """
-    
-    """
-    all_kw = []
-    for profile in profiles:
-        docs = read_all_lines_no_emoji(stemmer, profile)
-
-        all_kw.extend(remove_sim_kw(extract_kw_from_docs(docs, model, vec)))
-    return all_kw
+    return np.sum(cos_ndarray[cos_ndarray>threshold])
