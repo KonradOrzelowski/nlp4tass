@@ -3,6 +3,11 @@ import utils as utils
 
 import torch
 import numpy as np
+import pandas as pd
+import networkx as nx
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
 
 from datetime import datetime
 
@@ -20,7 +25,8 @@ class TassNlp:
         self.vectorizer = KeyphraseCountVectorizer()
         self.sentence_transformer = SentenceTransformer('all-MiniLM-L6-v2')
 
-    def read_profiles(self, profiles: list[str], start_date, end_date) -> dict:
+    def read_profiles(self, profiles: list[str], start_date = datetime(2000, 11, 1),
+                                                 end_date = datetime(2023, 1, 5)) -> dict:
         '''Read all docs without emoji'''
         all_docs = {}
         for profile in profiles:
@@ -54,15 +60,17 @@ def main():
     None.
     
     '''
-    profiles = ['garethbale11', 'harrykane']
-    
+    profiles = ['harrykane', 'trentarnold66', 'sterling7', 'kylewalker2',
+                'philfoden', 'reecejames', 'jackgrealish', 'ktrippier2',
+                'declanrice', 'madders', 'bukayosaka87', 'masonmount']
+
+
     tass_nlp = TassNlp()
     
-    all_docs = tass_nlp.read_profiles(profiles, datetime(2022, 11, 1), datetime(2022, 11, 30))
-    all_kw = tass_nlp.find_all_keywords(profiles, all_docs, 0.5)
+    all_docs = tass_nlp.read_profiles(profiles)
+    all_kw = tass_nlp.find_all_keywords(profiles, all_docs, threshold=0.5)
     all_en = tass_nlp.encode_keywords(profiles, all_kw)
-    similarity = utils.get_cos_similarity(all_en['garethbale11'], all_en['harrykane'])
-    print(f"Similarity {similarity}")
-
-# if __name__ == "__main__":
-#     main()
+    
+if __name__ == '__main__':
+    main()
+    
