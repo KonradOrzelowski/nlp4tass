@@ -1,7 +1,7 @@
 #%%
 '''
-get_insta_matrix  -> get strength of connections using insta
-get_sofifa_matrix -> get strength of connections using sofia
+get_insta_matrix  -> get connections using insta
+get_sofifa_matrix -> get connections using sofia
 plots graphs
 calculate similarity
 '''
@@ -9,7 +9,7 @@ import utils as utils
 from tass_nlp import TassNlp
 from tass_sofifa import TassSofia
 
-import torch
+# import torch
 import numpy as np
 import pandas as pd
 import networkx as nx
@@ -17,32 +17,43 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
-from datetime import datetime
+# from datetime import datetime
 
-from keybert import KeyBERT
-from nltk.stem.wordnet import WordNetLemmatizer
-from sentence_transformers import SentenceTransformer
-from keyphrase_vectorizers import KeyphraseCountVectorizer
+# from keybert import KeyBERT
+# from nltk.stem.wordnet import WordNetLemmatizer
+# from sentence_transformers import SentenceTransformer
+# from keyphrase_vectorizers import KeyphraseCountVectorizer
 #%% Insta
-
 
 profiles = ['harrykane', 'trentarnold66', 'sterling7', 'kylewalker2',
             'philfoden', 'reecejames', 'jackgrealish', 'ktrippier2',
-            'declanrice', 'madders', 'bukayosaka87', 'masonmount']   
-def get_insta_matrix(profiles, threshold = 0.5):
+            'declanrice', 'madders', 'bukayosaka87', 'masonmount',
+            'andyrobertson94', 'johnstonesofficial', 'vardy7', 'aaronramsdale',
+            'benchilwell', 'jpickford1', 'jhenderson', 'joegomez5',
+            'kalvinphillips', 'marcusrashford', 'awbissaka']   
+
+names = ['H. Kane', 'T. Alexander-Arnold', 'R. Sterling', 'K. Walker',
+         'P. Foden', 'R. James', 'J. Grealish', 'K. Trippier',
+         'D. Rice', 'J. Maddison', 'B. Saka', 'M. Mount',
+         'A. Robertson', 'J. Stones', 'J. Vardy', 'A. Ramsdale',
+         'B. Chilwell', 'J. Pickford', 'J. Henderson', 'J. Gomez',
+         'K. Phillips', 'M. Rashford', 'A. Wan-Bissaka']
+
+def get_insta_matrix(profiles, threshold_kw = 0.5, threshold_cos = 0.5):
 
 
     tass_nlp = TassNlp()
     
     all_docs = tass_nlp.read_profiles(profiles)
-    all_kw = tass_nlp.find_all_keywords(profiles, all_docs, threshold)
+    all_kw = tass_nlp.find_all_keywords(profiles, all_docs, threshold_kw)
     all_en = tass_nlp.encode_keywords(profiles, all_kw)
 
     df_list = []
     for i in profiles:
         lst = []
         for j in profiles:        
-            similarity = utils.get_cos_similarity(all_en[i], all_en[j])
+            similarity = utils.get_cos_similarity(all_en[i], all_en[j],
+                                                  threshold = threshold_cos)
             lst.append(similarity)
             # print(f"{i} {j} similarity {similarity}")
         df_list.append(lst)
@@ -64,9 +75,7 @@ def get_insta_matrix(profiles, threshold = 0.5):
 idf = get_insta_matrix(profiles)
 
 #%% Sofifa
-names = ['H. Kane', 'T. Alexander-Arnold', 'R. Sterling', 'K. Walker',
-         'P. Foden', 'R. James', 'J. Grealish', 'K. Trippier',
-         'D. Rice', 'J. Maddison', 'B. Saka', 'M. Mount']
+
 
 
 def get_sofifa_matrix(names, profiles):
@@ -152,7 +161,7 @@ def jaccard_similarity(g, h):
     i = set(g).intersection(h)
     return round(len(i) / (len(g) + len(h) - len(i)),3)
 
-jaccard_similarity(iG.edges(), sG.edges())
+print(f"jaccard_similarity {jaccard_similarity(iG.edges(), sG.edges())}")
 
 
 GH = nx.compose(iG,sG)

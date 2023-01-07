@@ -1,12 +1,12 @@
 #%%
 import utils as utils
 
-import torch
-import numpy as np
-import pandas as pd
-import networkx as nx
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+# import torch
+# import numpy as np
+# import pandas as pd
+# import networkx as nx
+# import matplotlib as mpl
+# import matplotlib.pyplot as plt
 
 
 from datetime import datetime
@@ -71,6 +71,6 @@ def main():
     all_kw = tass_nlp.find_all_keywords(profiles, all_docs, threshold=0.5)
     all_en = tass_nlp.encode_keywords(profiles, all_kw)
     
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
     

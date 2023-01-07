@@ -105,7 +105,7 @@ def remove_sim_kw(documents: list[str], threshold:float) -> list[str]:
     max_idx = np.argmax(pairwise_similarity, axis=1)
     
     
-    pairwise_similarity
+    # pairwise_similarity
     
     for idx, row in enumerate(pairwise_similarity):
         if(pairwise_similarity[idx][max_idx[idx]] >= threshold):
@@ -117,5 +117,8 @@ def get_cos_similarity(nd1: np.ndarray, nd2: np.ndarray,
                                              threshold = 0.5) -> np.float32:
     
     cos_ndarray = util.pytorch_cos_sim(nd1, nd2).numpy()
+    cos_ndarray = cos_ndarray.flatten()
     
-    return np.sum(cos_ndarray[cos_ndarray>threshold])
+    N_most = np.sort(cos_ndarray)[::-1][:10]
+    
+    return np.sum(N_most[N_most>threshold])

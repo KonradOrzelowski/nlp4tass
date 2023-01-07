@@ -28,5 +28,5 @@ def main():
     for name in names:
       footballers[name] = so.get_footballer_atr(name).values.flatten()
       
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

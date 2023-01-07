@@ -1,20 +1,19 @@
 import datetime
 from instaloader import Instaloader, Profile, TopSearchResults
 
-
-
 import time as time
 import random as random
 
 class TassInstaloader:
     
-    def __init__(self, user: str, password: str):
+    def __init__(self, user: str = None, password: str = None):
         self.user = user
         self.password = password
         
         # Login
         self.L = Instaloader()
-        self.L.login(self.user, self.password)
+        if(self.user is not None and self.password is not None):
+            self.L.login(self.user, self.password)
     
     def get_profile(self, profile_name: str) -> Profile:
         '''Get profile by profile name'''
@@ -51,7 +50,7 @@ class TassInstaloader:
                     continue
             else:
                 k += 1
-                time.sleep(random.randint(10,15))
+                time.sleep(random.randint(30, 45))
                 self.L.download_post(post, target = profile.username)
                 # k = 0  # set k to 0
                 if k == k_max:
@@ -63,7 +62,7 @@ class TassInstaloader:
                                reverse=True)
         
         for post in posts_sorted_by_likes[0:X]:
-            time.sleep(random.randint(9, 18))
+            time.sleep(random.randint(90, 180))
             self.L.download_post(post, target = profile.username)
 
 
@@ -72,15 +71,19 @@ class TassInstaloader:
         self.download_post_from_time_range(profile, posts, since, until)
 
 def main():
-    tass_instaloader = TassInstaloader('user', 'password')
-    
+    tass_instaloader = TassInstaloader()
+    '''
+
+    '''
     profiles = ['harrykane', 'trentarnold66', 'sterling7', 'kylewalker2',
                 'philfoden', 'reecejames', 'jackgrealish', 'ktrippier2',
-                'declanrice', 'madders', 'bukayosaka87', 'masonmount']
-    
+                'declanrice', 'madders', 'bukayosaka87', 'masonmount',
+                'andyrobertson94', 'johnstonesofficial', 'vardy7', 'aaronramsdale',
+                'benchilwell', 'jpickford1', 'jhenderson', 'joegomez5',
+                'kalvinphillips', 'marcusrashford', 'awbissaka']
     
     for person_name in profiles:
-        first, second = random.randrange(9, 18), random.randrange(9, 18)
+        first, second = random.randrange(90, 180), random.randrange(90, 180)
         print(f"{person_name} first wait {first}")
         
         profile = tass_instaloader.get_profile(person_name)
@@ -88,16 +91,18 @@ def main():
         posts = profile.get_posts()
     
         
-        # download posts from 2019-01-01 to 2019-01-31
+        # download posts from time range
         tass_instaloader.download_post_from_time_range(profile, posts,
                                                         datetime.datetime(2020, 11, 1),
-                                                        datetime.datetime(2023, 1, 1), k_max = 15)
+                                                        datetime.datetime(2022, 9, 1),
+                                                        k_max = 20)
         print(f"{person_name} second {second}")
         # tass_instaloader.download_X_popular(profile, 20)
         
         time.sleep(second)
 
 
-
+# if __name__ == '__main__':
+#     main()
 
 
