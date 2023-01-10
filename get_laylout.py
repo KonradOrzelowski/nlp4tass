@@ -62,19 +62,13 @@ def get_sofifa_matrix(names, profiles):
     return df
 
 
-def get_sofifa_layout(names, profiles,\
+def get_sofifa_layout(names, profiles, laylout,\
                       file = 'pos_sofifa.csv') -> pd.DataFrame:
 
     sdf = get_sofifa_matrix(names, profiles)
 
-    sG = nx.from_pandas_adjacency(sdf)
-    pos = nx.spring_layout(sG)
-
-    df = pd.DataFrame(pos).T
-    df.reset_index(inplace=True)
-    df.columns=['player', 'x', 'y']
+    df = make_csv(sdf, names, profiles, laylout)
     df.to_csv(file, index=False)
-    
     return df
 
 
@@ -108,27 +102,37 @@ def get_insta_matrix(profiles, threshold_kw = 0.5, threshold_cos = 0.5):
     
     return df
 
-
-def get_insta_layout(names, profiles,\
-                      file = 'pos_insta.csv') -> pd.DataFrame:
-
-    sdf = get_insta_matrix(profiles)
-
+def make_csv(sdf, names, profiles, laylout):
     sG = nx.from_pandas_adjacency(sdf)
-    pos = nx.spring_layout(sG)
-
+    
+    if laylout == 'spring_layout':
+        pos = nx.spring_layout(sG)
+    elif laylout == 'planar_layout':
+        pos = nx.planar_layout(sG)
+    elif laylout == 'kamada_kawai_layout':
+        pos = nx.kamada_kawai_layout(sG)
+    elif laylout == 'graphviz_layout':
+        pos = nx.graphviz_layout(sG)
+        
     df = pd.DataFrame(pos).T
     df.reset_index(inplace=True)
     df.columns=['player', 'x', 'y']
-    df.to_csv(file, index=False)
     
     return df
+    
+def get_insta_layout(names, profiles, laylout, \
+                      file = 'pos_insta.csv'):
+
+    sdf = get_insta_matrix(profiles)
+    
+    df = make_csv(sdf, names, profiles, laylout)
+    df.to_csv(file, index=False)
+
 
 
 def main():
-    get_sofifa_layout(names, profiles)
-    get_insta_layout(names, profiles)
-    
+    get_sofifa_layout(names, profiles, 'kamada_kawai_layout', 'pos_sofifa.csv')
+    get_insta_layout(names, profiles, 'kamada_kawai_layout', 'pos_insta.csv')
 
 # if __name__ == '__main__':
 #     main()
