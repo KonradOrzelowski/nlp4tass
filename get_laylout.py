@@ -48,8 +48,7 @@ def get_sofifa_matrix(names, profiles):
             
         df.append(lst)
     
-    sa = np.array(df)
-    
+    sa = np.array(df) 
     np.fill_diagonal(sa, 0)   
     row_sums = sa.sum(axis=1)
     sa = sa / row_sums[:, np.newaxis]
