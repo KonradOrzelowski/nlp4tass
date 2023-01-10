@@ -62,7 +62,7 @@ def get_insta_matrix(profiles, threshold_kw = 0.5, threshold_cos = 0.5):
     np.fill_diagonal(na, 0)   
     row_sums = na.sum(axis=1)
     na = na / row_sums[:, np.newaxis]
-    na = np.triu(na)
+    # na = np.triu(na)
     
     
     df = pd.DataFrame(na) 
@@ -105,7 +105,7 @@ def get_sofifa_matrix(names, profiles):
     np.fill_diagonal(sa, 0)   
     row_sums = sa.sum(axis=1)
     sa = sa / row_sums[:, np.newaxis]
-    sa = np.triu(sa)
+    # sa = np.triu(sa)
     
     df = pd.DataFrame(sa) 
     df.columns = profiles
@@ -140,6 +140,8 @@ sdf = get_sofifa_matrix(names, profiles)
 
 sG = nx.from_pandas_adjacency(sdf)
 pos = nx.spring_layout(sG)
+
+
 
 
 _,weights = zip(*nx.get_edge_attributes(sG,'weight').items())
